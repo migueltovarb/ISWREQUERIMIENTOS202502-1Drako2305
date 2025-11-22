@@ -1,0 +1,115 @@
+{% extends 'reclamos/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Sección de Bienvenida -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-gradient">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-3">¡Bienvenido al Sistema de Reclamos!</h2>
+                            <p class="lead text-muted mb-4">
+                                Aquí puedes gestionar tus reclamos de manera fácil y rápida.
+                            </p>
+                            <div class="d-flex gap-3">
+                                <a href="{% url 'reclamos:crear_reclamo' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Reclamo
+                                </a>
+                                <a href="{% url 'reclamos:lista_reclamos' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-2"></i>Ver Mis Reclamos
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-clipboard-list display-1 text-primary opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reclamos Recientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Mis Reclamos Recientes
+                    </h5>
+                    <a href="{% url 'reclamos:lista_reclamos' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>Ver Todos
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Referencia</th>
+                                    <th>Título</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reclamo in reclamos_recientes %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-light text-dark">
+                                            {{ reclamo.numero_referencia }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reclamo.titulo }}</td>
+                                    <td>
+                                        <span class="badge {% if reclamo.estado == 'PENDIENTE' %}bg-danger
+                                            {% elif reclamo.estado == 'EN_PROGRESO' %}bg-warning
+                                            {% elif reclamo.estado == 'RESUELTO' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ reclamo.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="{% url 'reclamos:detalle_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'reclamos:editar_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-success" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'reclamos:eliminar_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" 
+                                             alt="No hay reclamos" 
+                                             style="width: 120px; opacity: 0.5;" 
+                                             class="mb-3">
+                                        <p class="text-muted mb-0">No tienes reclamos registrados.</p>
+                                        <a href="{% url 'reclamos:crear_reclamo' %}" class="btn btn-primary mt-3">
+                                            <i class="fas fa-plus-circle me-2"></i>Crear Primer Reclamo
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

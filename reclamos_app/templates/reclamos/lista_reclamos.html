@@ -1,0 +1,90 @@
+{% extends 'reclamos/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Mis Reclamos
+                    </h4>
+                    <a href="{% url 'reclamos:crear_reclamo' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Nuevo Reclamo
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Referencia</th>
+                                    <th>Título</th>
+                                    <th>Categoría</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reclamo in reclamos %}
+                                <tr>
+                                    <td>{{ reclamo.numero_referencia }}</td>
+                                    <td>{{ reclamo.titulo }}</td>
+                                    <td>{{ reclamo.get_categoria_display }}</td>
+                                    <td>
+                                        <span class="badge {% if reclamo.prioridad == 'ALTA' %}bg-danger
+                                            {% elif reclamo.prioridad == 'MEDIA' %}bg-warning
+                                            {% else %}bg-info{% endif %}">
+                                            {{ reclamo.get_prioridad_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if reclamo.estado == 'PENDIENTE' %}bg-danger
+                                            {% elif reclamo.estado == 'EN_PROGRESO' %}bg-warning
+                                            {% elif reclamo.estado == 'RESUELTO' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ reclamo.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'reclamos:detalle_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'reclamos:editar_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'reclamos:eliminar_reclamo' reclamo.pk %}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Eliminar">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <p class="text-muted mb-0">No hay reclamos registrados.</p>
+                                        <a href="{% url 'reclamos:crear_reclamo' %}" class="btn btn-primary mt-3">
+                                            <i class="fas fa-plus-circle me-2"></i>Crear Primer Reclamo
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

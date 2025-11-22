@@ -1,0 +1,41 @@
+{% extends 'reclamos/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Eliminar Reclamo
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">¿Estás seguro que deseas eliminar el siguiente reclamo?</p>
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">{{ reclamo.titulo }}</h5>
+                        <p class="mb-0"><strong>Número de referencia:</strong> {{ reclamo.numero_referencia }}</p>
+                        <p class="mb-0"><strong>Estado:</strong> {{ reclamo.get_estado_display }}</p>
+                        <p class="mb-0"><strong>Fecha de creación:</strong> {{ reclamo.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Esta acción no se puede deshacer.
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'reclamos:detalle_reclamo' reclamo.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Eliminar Reclamo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

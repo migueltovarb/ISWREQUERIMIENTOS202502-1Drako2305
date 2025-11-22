@@ -1,0 +1,173 @@
+{% extends 'reclamos/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>{{ reclamo.titulo }}
+                    </h4>
+                    <div>
+                        <a href="{% url 'reclamos:editar_reclamo' reclamo.pk %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </a>
+                        <a href="{% url 'reclamos:eliminar_reclamo' reclamo.pk %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt me-1"></i>Eliminar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Número de Referencia:</strong></p>
+                            <p class="text-primary">{{ reclamo.numero_referencia }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Estado:</strong></p>
+                            <span class="badge {% if reclamo.estado == 'PENDIENTE' %}bg-danger
+                                {% elif reclamo.estado == 'EN_PROGRESO' %}bg-warning
+                                {% elif reclamo.estado == 'RESUELTO' %}bg-success
+                                {% else %}bg-secondary{% endif %}">
+                                {{ reclamo.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Categoría:</strong></p>
+                            <p>{{ reclamo.get_categoria_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Prioridad:</strong></p>
+                            <p>{{ reclamo.get_prioridad_display }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Descripción:</strong></p>
+                        <p class="text-muted">{{ reclamo.descripcion }}</p>
+                    </div>
+
+                    <!-- Archivos Adjuntos -->
+                    <div class="mb-3">
+                        <h5 class="mb-3">
+                            <i class="fas fa-paperclip me-2"></i>Archivos Adjuntos
+                        </h5>
+                        {% if reclamo.archivos.all %}
+                            <div class="row g-3">
+                                {% for archivo in reclamo.archivos.all %}
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            {% if archivo.es_imagen %}
+                                                <img src="{{ archivo.archivo.url }}" 
+                                                     class="card-img-top" 
+                                                     alt="{{ archivo.nombre_original }}"
+                                                     style="height: 150px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="card-img-top text-center py-4 bg-light">
+                                                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="card-body">
+                                                <h6 class="card-title text-truncate" title="{{ archivo.nombre_original }}">
+                                                    {{ archivo.nombre_original }}
+                                                </h6>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        Subido el {{ archivo.fecha_subida|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                </p>
+                                                <a href="{{ archivo.archivo.url }}" 
+                                                   class="btn btn-sm btn-primary" 
+                                                   target="_blank">
+                                                    <i class="fas fa-download me-1"></i>Descargar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay archivos adjuntos.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Fecha de Creación:</strong></p>
+                            <p class="text-muted">{{ reclamo.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Última Actualización:</strong></p>
+                            <p class="text-muted">{{ reclamo.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Comentarios -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-comments me-2"></i>Comentarios
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form_comentario.contenido }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Comentario
+                        </button>
+                    </form>
+
+                    <div class="list-group">
+                        {% for comentario in comentarios %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ comentario.autor.username }}</h6>
+                                    <small class="text-muted">{{ comentario.fecha|timesince }}</small>
+                                </div>
+                                <p class="mb-1">{{ comentario.contenido }}</p>
+                                {% if comentario.es_respuesta_oficial %}
+                                    <span class="badge bg-primary">Respuesta Oficial</span>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <div class="text-center text-muted py-3">
+                                No hay comentarios aún.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra lateral -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Historial
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <small class="text-muted">{{ reclamo.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                        <p class="mb-0">Reclamo creado</p>
+                    </div>
+                    {% for comentario in comentarios %}
+                        <div class="list-group-item">
+                            <small class="text-muted">{{ comentario.fecha|date:"d/m/Y H:i" }}</small>
+                            <p class="mb-0">Nuevo comentario por {{ comentario.autor.username }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
